@@ -28,14 +28,19 @@ class Database
     void close();
     void read(); 
     char* getRecord(int index);
-    void setRecord(int index, const char* value); 
+    void setRecord(int index, const char* value, bool isLast = false); 
     void write(); 
 };
 
 
+// ************************************************************************************
+// default constructor 
+// 
 Database::Database(){
 }
 
+// ************************************************************************************
+//  
 char* Database::getWifiSsid(){
   if (this->isConfigured())
     return this->getRecord(WIFI_SSID_INDEX);
@@ -43,6 +48,8 @@ char* Database::getWifiSsid(){
   return NULL;
 }
 
+// ************************************************************************************
+//  
 char* Database::getWifiPasswd(){
   if (this->isConfigured())
     return this->getRecord(WIFI_PASSWD_INDEX);
@@ -50,28 +57,38 @@ char* Database::getWifiPasswd(){
   return NULL;
 }
 
+// ************************************************************************************
+//  
 void Database::setWifiData(const char* ssid, const char* passwd){
   this->read();
-  this->setData(GUID_INDEX, SETUP_GUID); 
-  this->setData(WIFI_SSID_INDEX, ssid);
-  this->setData(WIFI_PASSWD_INDEX, passwd); 
+  this->setRecord(GUID_INDEX, SETUP_GUID); 
+  this->setRecord(WIFI_SSID_INDEX, ssid);
+  this->setRecord(WIFI_PASSWD_INDEX, passwd, true); 
   this->write();
 }
 
+// ************************************************************************************
+//  
 bool Database::isConfigured() {
   this->read();
   char* guid = this->getRecord(GUID_INDEX);
   return (strcmp(guid, SETUP_GUID) == 0);
 }
 
+// ************************************************************************************
+//  
 void Database::open() {
   EEPROM.begin(EEPROM_SIZE);
 }
 
+// ************************************************************************************
+//  
 void Database::close() {
   EEPROM.end();
 }
 
+// ************************************************************************************
+//  
 void Database::read(){
   this->open();
   
@@ -82,6 +99,8 @@ void Database::read(){
   this->close();
 }
 
+// ************************************************************************************
+//  
 void Database::write(){
   this->open();
   int len = strlen(this->_dataBuffer);
@@ -91,7 +110,9 @@ void Database::write(){
   this->close();
 }
 
-char* Database::getRecord(const char* src, int index)
+// ************************************************************************************
+//  
+char* Database::getRecord(int index)
 {
   int curIndex = 0; 
   
@@ -120,6 +141,8 @@ char* Database::getRecord(const char* src, int index)
   return false;
 }
 
+// ************************************************************************************
+//  
 void Database::setRecord(int index, const char* value, bool isLast)
 {
   char* recordPtr = this->getRecord(index); 
