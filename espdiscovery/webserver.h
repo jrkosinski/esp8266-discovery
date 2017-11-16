@@ -16,6 +16,13 @@
 #include "storage.h" 
 
 
+class SetDataCallback
+{ 
+  public:
+    SetDataCallback() { }
+    bool dataSet(); 
+};
+
 /****************************************
  * WebServer
  * ----------
@@ -26,9 +33,10 @@ class WebServer
   private: 
     ESP8266WebServer* _server;
     Database* _database;
+    SetDataCallback* _setCallback;
     
   public:
-    WebServer(Database* database); 
+    WebServer(Database* database, SetDataCallback* setCallback); 
     
     void start(); 
     void listen();
@@ -39,27 +47,27 @@ class WebServer
 };
 /****************************************/
 
-
 // ************************************************************************************
 // constructor 
 //  
-WebServer::WebServer(Database* database)
+WebServer::WebServer(Database* database, SetDataCallback* setCallback)
 {
   this->_server = new ESP8266WebServer(80); 
   this->_database = database;
+  this->_setCallback = setCallback;
 }
 
 void WebServer::start() {  
+  
+  //this->_server->on("/getData", handleget);
   this->_server->on("/getData", []() {
-    //handleGetData();
-  });
-  this->_server->on("/getData", []() {
-    //handleSetData();
+    //instance->handleSetData();
   });
   this->_server->begin();
 }
 
 void WebServer::listen() {  
+  this->_server->handleClient();
 }
 
 void WebServer::handleGetData() {
@@ -74,7 +82,9 @@ void WebServer::handleSetData() {
 
   this->_database->setWifiData(ssid.c_str(), passwd.c_str()); 
   
-  handleGetData();
+  if (this->_setCallback->dataSet()){
+    WifiDTO dto(this->_database->getWifiSsid(), this->_database->getWifiPasswd(), WiFi.localIP());
+  }
 }
 
 #endif

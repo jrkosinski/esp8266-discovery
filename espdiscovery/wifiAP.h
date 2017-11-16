@@ -28,7 +28,8 @@ class WifiAP
   public:
     WifiAP(); 
     
-    void start(); 
+    void begin(); 
+    void end(); //TODO: implement
 };
 /****************************************/
 
@@ -40,7 +41,7 @@ WifiAP::WifiAP()
 {
 }
 
-void WifiAP::start() {  
+void WifiAP::begin() {  
   
   static char ssid[12];
   sprintf(ssid, "IoThing %02d", ESP.getChipId() % 100);

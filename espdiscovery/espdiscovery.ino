@@ -5,21 +5,29 @@
 #include "wifiAP.h"
 #include "storage.h" 
 #include "webserver.h"
+#include "upnp.h"
 
 #define MODE_NORMAL 1
 #define MODE_SETUP  0
+#define UDP_PORT    8521
 
 WifiConnection* wifi;           // wifi connection
 WifiAP* ap;                     // wifi access point
 Database* database;             // EEPROM db
 WebServer* webServer;           // web server
+SetDataCallback* setCallback;   // callback when new data's been received from client 
+UpnpServer* upnp;               // UDP server listener (for probing requests) 
 
 bool dbConfigured = false; 
 byte progMode = MODE_NORMAL;
 
 void setup() {
   database = new Database(); 
+  webServer = new WebServer(database, setCallback);
   dbConfigured = database->isConfigured();
+  ap = new WifiAP(); 
+  upnp = new UpnpServer(UDP_PORT);
+  
   bool wifiConnected = false;
   
   if (dbConfigured){
@@ -33,22 +41,35 @@ void setup() {
 
   //not connected yet; start AP (enter setup mode)
   if (!wifiConnected) {
+    enterSetupMode();
   }
 }
 
 void loop() {
   if (progMode == MODE_NORMAL){
-    
+    upnp->listen();
   }
-  else {
     
-  }
+  webServer->listen();
 }
 
 void enterSetupMode()
 {
   progMode = MODE_SETUP;
-  ap = new WifiAP(); 
-  ap->start(); 
+  ap->begin(); 
+}
+
+void enterNormalMode()
+{
+  progMode = MODE_NORMAL;
+  upnp->begin(); 
+}
+
+bool SetDataCallback::dataSet(){
+  if (wifi->tryConnect()){
+    enterNormalMode(); 
+    return true;
+  }
+  return false;
 }
 

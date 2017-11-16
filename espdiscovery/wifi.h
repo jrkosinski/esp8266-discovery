@@ -33,6 +33,7 @@ class WifiConnection
     WifiConnection(const char* ssid, const char* passwd); 
 
     void begin(); 
+    void end(); //TODO: implement
     bool tryConnect();
     bool connect(); 
 };
