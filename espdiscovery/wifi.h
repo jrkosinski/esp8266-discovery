@@ -10,6 +10,8 @@
 #include <WiFiUdp.h>
 #include "debug.h" 
 
+#define MAX_CONNECT_ATTEMPTS 3
+
 
 /****************************************
  * WifiConnection
@@ -31,6 +33,7 @@ class WifiConnection
     WifiConnection(const char* ssid, const char* passwd); 
 
     void begin(); 
+    bool tryConnect();
     bool connect(); 
 };
 /****************************************/
@@ -57,6 +60,20 @@ void WifiConnection::begin()
 {
   DEBUG_PRINTLN("Wifi:begin"); 
   this->_enabled = true; 
+}
+
+// ************************************************************************************
+// attempts to connect to the wifi a predfined max number of times before 
+// returning failure
+// 
+bool WifiConnection::tryConnect()
+{
+  for(int n=0; n<MAX_CONNECT_ATTEMPTS; n++){
+    if (this->connect())
+      return true;
+  }
+
+  return false;
 }
 
 // ************************************************************************************
