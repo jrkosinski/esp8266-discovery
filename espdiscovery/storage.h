@@ -10,6 +10,11 @@
 #define WIFI_SSID_INDEX 1
 #define WIFI_PASSWD_INDEX 2
 
+/****************************************
+ * Database
+ * ---------
+ *  
+ */
 class Database 
 {
   private: 
@@ -31,6 +36,7 @@ class Database
     void setRecord(int index, const char* value, bool isLast = false); 
     void write(); 
 };
+/****************************************/
 
 
 // ************************************************************************************

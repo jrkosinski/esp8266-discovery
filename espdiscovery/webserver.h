@@ -47,6 +47,7 @@ class WebServer
 };
 /****************************************/
 
+
 // ************************************************************************************
 // constructor 
 //  
@@ -57,6 +58,8 @@ WebServer::WebServer(Database* database, SetDataCallback* setCallback)
   this->_setCallback = setCallback;
 }
 
+// ************************************************************************************
+//  
 void WebServer::start() {  
   
   //this->_server->on("/getData", handleget);
@@ -66,16 +69,22 @@ void WebServer::start() {
   this->_server->begin();
 }
 
+// ************************************************************************************
+//  
 void WebServer::listen() {  
   this->_server->handleClient();
 }
 
+// ************************************************************************************
+//  
 void WebServer::handleGetData() {
   char buffer[512]; 
   WifiDTO dto(this->_database->getWifiSsid(), this->_database->getWifiPasswd());
   this->_server->send(200, "text/json", dto.toJson(buffer));
 }
 
+// ************************************************************************************
+//  
 void WebServer::handleSetData() {
   String ssid = this->_server->arg("ssid");
   String passwd = this->_server->arg("password");

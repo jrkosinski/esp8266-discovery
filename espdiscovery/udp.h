@@ -13,6 +13,11 @@
 #define UDP_PACKET_SIZE 255
 #define UDP_SEARCH_PATTERN "*3*" //TODO: implement
 
+/****************************************
+ * UdpServer
+ * ----------
+ *  
+ */
 class UdpServer 
 {
   private: 
@@ -28,20 +33,29 @@ class UdpServer
     void listen();
     void handleProbe(IPAddress remoteIP, unsigned int remotePort, uint8_t *data, size_t len); 
 };
+/****************************************/
 
 
+// ************************************************************************************
+//  
 UdpServer::UdpServer(uint32_t port){
   this->_port = port;
 }
 
+// ************************************************************************************
+//  
 void UdpServer::begin(){
   this->_udp.begin(this->_port); 
 }
 
+// ************************************************************************************
+//  
 void UdpServer::end(){
   //TODO: implement
 }
 
+// ************************************************************************************
+//  
 void UdpServer::listen(){
   int cb = this->_udp.parsePacket();
   if (cb) {
@@ -53,6 +67,8 @@ void UdpServer::listen(){
   }
 }
 
+// ************************************************************************************
+//  
 void UdpServer::handleProbe(IPAddress remoteIP, unsigned int remotePort, uint8_t *data, size_t len) 
 {
   data[len] = 0;
