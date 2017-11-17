@@ -3,6 +3,7 @@
 var async = require('asyncawait/async');
 var await = require('asyncawait/await');
 var config = require('../config');
+var logger = require('../util/logger')('WEB');
 var http = require('http'); 
 
 function doRequest(options, onResult)
@@ -13,17 +14,17 @@ function doRequest(options, onResult)
         console.log(options.host + ':' + res.statusCode);
         res.setEncoding('utf8');
 
-        res.on('data', function (chunk) {
+        res.on('data', (chunk) => {
             output += chunk;
         });
 
-        res.on('end', function() {
+        res.on('end', () => {
             var obj = JSON.parse(output);
             onResult(res.statusCode, obj);
         });
     });
 
-    req.on('error', function(err) {
+    req.on('error', (err) => {
         //res.send('error: ' + err.message);
         onResult(500, null);
     });

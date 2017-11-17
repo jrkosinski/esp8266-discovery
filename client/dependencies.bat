@@ -1,1 +1,1 @@
-npm install asyncawait node-wifi node-storage --save
+npm install asyncawait node-wifi node-storage node-netcat --save
