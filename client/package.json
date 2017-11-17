@@ -16,7 +16,6 @@
   "dependencies": {
     "asyncawait": "^1.0.6",
     "node-netcat": "^1.4.8",
-    "node-storage": "0.0.7",
-    "node-wifi": "^1.2.5"
+    "node-storage": "0.0.7"
   }
 }

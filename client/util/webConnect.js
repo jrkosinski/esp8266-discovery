@@ -11,7 +11,7 @@ function doRequest(options, onResult)
     var req = http.request(options, function(res)
     {
         var output = '';
-        console.log(options.host + ':' + res.statusCode);
+        logger.info(options.host + ':' + res.statusCode);
         res.setEncoding('utf8');
 
         res.on('data', (chunk) => {
@@ -52,6 +52,7 @@ var pingServer = async(function(ip) {
 }); 
 
 var sendRequest = async(function(appData) {
+    /*
     var options = {
         host: appData.ip,
         port: 80,
@@ -61,6 +62,8 @@ var sendRequest = async(function(appData) {
             'Content-Type': 'application/json'
         }
     };
+    */
+    return await(pingServer("www.ziggurat.com")); 
 }); 
 
 module.exports = {
