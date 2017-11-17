@@ -7,9 +7,10 @@
 #include "webserver.h"
 #include "udp.h"
 
-#define MODE_NORMAL 1
-#define MODE_SETUP  0
-#define UDP_PORT    8521
+#define MODE_NORMAL       1
+#define MODE_SETUP        0
+#define UDP_PORT          8021
+#define SERIAL_BAUD_RATE  9600
 
 WifiConnection* wifi;           // wifi connection
 WifiAP* ap;                     // wifi access point
@@ -22,7 +23,11 @@ bool dbConfigured = false;
 byte progMode = MODE_NORMAL;
 
 void setup() {
+  Serial.begin(SERIAL_BAUD_RATE); 
+  
   database = new Database(); 
+  database->open(); 
+  
   webServer = new WebServer(database, setCallback);
   dbConfigured = database->isConfigured();
   ap = new WifiAP(); 
@@ -42,6 +47,10 @@ void setup() {
   //not connected yet; start AP (enter setup mode)
   if (!wifiConnected) {
     enterSetupMode();
+  }
+  else {
+    webServer->start();
+    udp->begin(); 
   }
 }
 

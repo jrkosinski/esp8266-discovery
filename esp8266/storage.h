@@ -5,10 +5,13 @@
 #include <EEPROM.h>
 
 #define SETUP_GUID "##a136462c-16d3-4638-82e4-f8a4b08d137b##" 
-#define EEPROM_SIZE 4096
+#define EEPROM_SIZE 1024
 #define GUID_INDEX 0
 #define WIFI_SSID_INDEX 1
 #define WIFI_PASSWD_INDEX 2
+
+const char* test_ssid = "mina" ; 
+const char* test_passwd = "HappyTime"; 
 
 /****************************************
  * Database
@@ -27,10 +30,10 @@ class Database
     char* getWifiPasswd(); 
     void setWifiData(const char* ssid, const char* passwd);
     bool isConfigured(); 
-
-  private: 
     void open();
     void close();
+
+  private: 
     void read(); 
     char* getRecord(int index);
     void setRecord(int index, const char* value, bool isLast = false); 
@@ -46,8 +49,10 @@ Database::Database(){
 }
 
 // ************************************************************************************
-//  
+// 
+//TODO: this should be combined so we dont have to read twice in a row
 char* Database::getWifiSsid(){
+  return (char*)test_ssid;
   if (this->isConfigured())
     return this->getRecord(WIFI_SSID_INDEX);
 
@@ -57,6 +62,7 @@ char* Database::getWifiSsid(){
 // ************************************************************************************
 //  
 char* Database::getWifiPasswd(){
+  return (char*)test_passwd;
   if (this->isConfigured())
     return this->getRecord(WIFI_PASSWD_INDEX);
 
@@ -66,6 +72,7 @@ char* Database::getWifiPasswd(){
 // ************************************************************************************
 //  
 void Database::setWifiData(const char* ssid, const char* passwd){
+  return; 
   this->read();
   this->setRecord(GUID_INDEX, SETUP_GUID); 
   this->setRecord(WIFI_SSID_INDEX, ssid);
@@ -76,6 +83,7 @@ void Database::setWifiData(const char* ssid, const char* passwd){
 // ************************************************************************************
 //  
 bool Database::isConfigured() {
+  return true;
   this->read();
   char* guid = this->getRecord(GUID_INDEX);
   return (strcmp(guid, SETUP_GUID) == 0);
@@ -96,24 +104,18 @@ void Database::close() {
 // ************************************************************************************
 //  
 void Database::read(){
-  this->open();
-  
   for(int n=0; n<EEPROM_SIZE; n++) {
     this->_dataBuffer[n] = EEPROM.read(n); 
   }
-  
-  this->close();
 }
 
 // ************************************************************************************
 //  
 void Database::write(){
-  this->open();
   int len = strlen(this->_dataBuffer);
   for(int n=0; n<len; n++){
     
   }
-  this->close();
 }
 
 // ************************************************************************************

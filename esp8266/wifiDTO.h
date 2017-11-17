@@ -46,16 +46,16 @@ WifiDTO::WifiDTO(const char* ssid, const char* passwd, IPAddress localIP) : Wifi
 //  
 char* WifiDTO::toJson(char* buffer) {  
   strcpy(buffer, "{ ssid:\""); 
-  strcpy(buffer, this->_ssid); 
-  strcpy(buffer, "\" password:\""); 
-  strcpy(buffer, this->_password); 
+  strcpy(buffer+strlen(buffer), this->_ssid); 
+  strcpy(buffer+strlen(buffer), "\" password:\""); 
+  strcpy(buffer+strlen(buffer), this->_password); 
 
   if (this->_localIP != NULL){
-    strcpy(buffer, "\" localIP:\""); 
-    strcpy(buffer, this->_localIP);
+    strcpy(buffer+strlen(buffer), "\" localIP:\""); 
+    strcpy(buffer+strlen(buffer), this->_localIP);
   }
   
-  strcpy(buffer, "\" }"); 
+  strcpy(buffer+strlen(buffer), "\" }"); 
 
   return buffer;
 }

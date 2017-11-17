@@ -23,6 +23,10 @@ class SetDataCallback
     bool dataSet(); 
 };
 
+bool getReceived = false;
+bool setReceived = false; 
+bool pingReceived = false; 
+
 /****************************************
  * WebServer
  * ----------
@@ -42,8 +46,9 @@ class WebServer
     void listen();
 
   private: 
-    void handleGetData(); 
-    void handleSetData(); 
+    void handleGet(); 
+    void handleSet(); 
+    void handlePing();
 };
 /****************************************/
 
@@ -61,10 +66,17 @@ WebServer::WebServer(Database* database, SetDataCallback* setCallback)
 // ************************************************************************************
 //  
 void WebServer::start() {  
+  DEBUG_PRINTLN("starting web server"); 
   
-  //this->_server->on("/getData", handleget);
-  this->_server->on("/getData", []() {
-    //instance->handleSetData();
+  this->_server->on("/get", []() {
+    getReceived = true;
+  });
+  this->_server->on("/set", []() {
+    setReceived = true;
+  });
+  this->_server->on("/ping", []() {
+    DEBUG_PRINTLN("received ping");
+    pingReceived = true;
   });
   this->_server->begin();
 }
@@ -73,19 +85,39 @@ void WebServer::start() {
 //  
 void WebServer::listen() {  
   this->_server->handleClient();
+
+  if (getReceived){
+    getReceived  = false;
+    this->handleGet();
+  }
+  if (setReceived){
+    setReceived  = false;
+    this->handleSet(); 
+  }
+  if (pingReceived) {
+    pingReceived  = false;
+    this->handlePing(); 
+  }
 }
 
 // ************************************************************************************
 //  
-void WebServer::handleGetData() {
+void WebServer::handleGet() {
   char buffer[512]; 
-  WifiDTO dto(this->_database->getWifiSsid(), this->_database->getWifiPasswd());
+  WifiDTO dto(this->_database->getWifiSsid(), this->_database->getWifiPasswd(), WiFi.localIP());
   this->_server->send(200, "text/json", dto.toJson(buffer));
 }
 
 // ************************************************************************************
 //  
-void WebServer::handleSetData() {
+void WebServer::handlePing() {
+  DEBUG_PRINTLN("handling ping");
+  this->_server->send(200, "text/json", "{}");
+}
+
+// ************************************************************************************
+//  
+void WebServer::handleSet() {
   String ssid = this->_server->arg("ssid");
   String passwd = this->_server->arg("password");
 
