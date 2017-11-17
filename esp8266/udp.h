@@ -83,11 +83,14 @@ void UdpServer::handleProbe(IPAddress remoteIP, unsigned int remotePort, uint8_t
   {
     DEBUG_PRINTLN("UDP sending response to "); 
     DEBUG_PRINTLN(remoteIP.toString().c_str()); 
+
+    char buffer[255]; 
+    sprintf(buffer, "{ \"ip\": \"%s\" }", WiFi.localIP().toString().c_str()); 
     
     //send response 
     WiFiUDP udpClient;
     udpClient.beginPacket(remoteIP, remotePort);
-    udpClient.write(WiFi.localIP().toString().c_str());
+    udpClient.write(buffer);
     udpClient.endPacket();
   }
 }
