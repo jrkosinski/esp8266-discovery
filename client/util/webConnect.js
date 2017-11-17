@@ -26,7 +26,7 @@ function doRequest(options, onResult)
 
     req.on('error', (err) => {
         //res.send('error: ' + err.message);
-        onResult(500, null);
+            onResult(500, null);
     });
 
     req.end();
@@ -53,7 +53,7 @@ var pingServer = async(function(ip) {
 
 var sendRequest = async(function(appData) {
     var options = {
-        host: ip,
+        host: appData.ip,
         port: 80,
         path: '/set',
         method: 'GET',
@@ -64,5 +64,6 @@ var sendRequest = async(function(appData) {
 }); 
 
 module.exports = {
-    pingServer : pingServer
+    pingServer : pingServer,
+    sendRequest : sendRequest
 };
