@@ -12,6 +12,7 @@
 
 #define MAX_CONNECT_ATTEMPTS 3
 
+//TODO: don't try reconnecting forever when connection lost 
 
 /****************************************
  * WifiConnection

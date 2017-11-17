@@ -1,6 +1,7 @@
 #include <Arduino.h> 
 
 #include "debug.h" 
+#include "blink.h" 
 #include "wifi.h"
 #include "wifiAP.h"
 #include "storage.h" 
@@ -22,14 +23,28 @@ UdpServer* udp;                 // UDP server listener (for probing requests)
 bool dbConfigured = false; 
 byte progMode = MODE_NORMAL;
 
+// ************************************************************************************
 void setup() {
   Serial.begin(SERIAL_BAUD_RATE); 
+
+  LED::begin();
+  LED::blink(3); 
   
   database = new Database(); 
-  database->open(); 
+  database->begin(); 
   
-  webServer = new WebServer(database, setCallback);
   dbConfigured = database->isConfigured();
+
+  if (!dbConfigured){
+    database->setWifiData("mina", "HappyTime");
+    dbConfigured = database->isConfigured();
+  }
+
+  DEBUG_PRINTLN("wifi data:");
+  DEBUG_PRINTLN(database->getWifiSsid());
+  DEBUG_PRINTLN(database->getWifiPasswd());
+
+  webServer = new WebServer(database, setCallback);
   ap = new WifiAP(); 
   udp = new UdpServer(UDP_PORT);
   
@@ -53,31 +68,40 @@ void setup() {
   }
 }
 
+// ************************************************************************************
 void loop() {
   if (progMode == MODE_NORMAL){
-    udp->listen();
+    if (udp)
+      udp->listen();
   } 
   else {
-    ap->listen();
+    if (ap)
+      ap->listen();
   }
-    
-  webServer->listen();
+
+  if (webServer)
+    webServer->listen();
 }
 
+// ************************************************************************************
 void enterSetupMode()
 {
+  DEBUG_PRINTLN("entering setup mode...");
   progMode = MODE_SETUP;
   ap->begin(); 
   webServer->start();
 }
 
+// ************************************************************************************
 void enterNormalMode()
 {
+  DEBUG_PRINTLN("entering normal mode...");
   progMode = MODE_NORMAL;
-    webServer->start();
-    udp->begin(); 
+  webServer->start();
+  udp->begin(); 
 }
 
+// ************************************************************************************
 bool SetDataCallback::dataSet(){
   if (wifi->tryConnect()){
     enterNormalMode(); 

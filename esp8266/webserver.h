@@ -69,9 +69,11 @@ void WebServer::start() {
   DEBUG_PRINTLN("starting web server"); 
   
   this->_server->on("/get", []() {
+    DEBUG_PRINTLN("received get");
     getReceived = true;
   });
   this->_server->on("/set", []() {
+    DEBUG_PRINTLN("received set");
     setReceived = true;
   });
   this->_server->on("/ping", []() {
@@ -100,6 +102,7 @@ void WebServer::listen() {
   }
 }
 
+//TODO: handle these callbacks better 
 // ************************************************************************************
 //  
 void WebServer::handleGet() {

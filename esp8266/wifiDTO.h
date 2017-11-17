@@ -45,7 +45,7 @@ WifiDTO::WifiDTO(const char* ssid, const char* passwd, IPAddress localIP) : Wifi
 // ************************************************************************************
 //  
 char* WifiDTO::toJson(char* buffer) {  
-  sprintf(buffer, "{ \"ssid\":\"%s\", \"password\":\"%s\", \"ip\":\"%s\" }", 
+  sprintf(buffer, "{ \"ssid\":\"%s\", \"password\":\"******\", \"ip\":\"%s\" }", 
     this->_ssid, 
     this->_password, 
     this->_localIP != NULL ? this->_localIP : ""

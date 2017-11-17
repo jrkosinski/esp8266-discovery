@@ -25,19 +25,21 @@ class Database
     
   public: 
     Database();
+    ~Database();
 
     char* getWifiSsid();
     char* getWifiPasswd(); 
     void setWifiData(const char* ssid, const char* passwd);
     bool isConfigured(); 
-    void open();
-    void close();
+    void begin();
+    void end();
 
   private: 
     void read(); 
     char* getRecord(int index);
     void setRecord(int index, const char* value, bool isLast = false); 
     void write(); 
+    void printContents();
 };
 /****************************************/
 
@@ -47,12 +49,14 @@ class Database
 // 
 Database::Database(){
 }
+Database::~Database(){
+  this->end();
+}
 
 // ************************************************************************************
 // 
 //TODO: this should be combined so we dont have to read twice in a row
 char* Database::getWifiSsid(){
-  return (char*)test_ssid;
   if (this->isConfigured())
     return this->getRecord(WIFI_SSID_INDEX);
 
@@ -62,7 +66,6 @@ char* Database::getWifiSsid(){
 // ************************************************************************************
 //  
 char* Database::getWifiPasswd(){
-  return (char*)test_passwd;
   if (this->isConfigured())
     return this->getRecord(WIFI_PASSWD_INDEX);
 
@@ -72,10 +75,9 @@ char* Database::getWifiPasswd(){
 // ************************************************************************************
 //  
 void Database::setWifiData(const char* ssid, const char* passwd){
-  return; 
   this->read();
-  this->setRecord(GUID_INDEX, SETUP_GUID); 
-  this->setRecord(WIFI_SSID_INDEX, ssid);
+  this->setRecord(GUID_INDEX, SETUP_GUID, false); 
+  this->setRecord(WIFI_SSID_INDEX, ssid, false);
   this->setRecord(WIFI_PASSWD_INDEX, passwd, true); 
   this->write();
 }
@@ -83,21 +85,24 @@ void Database::setWifiData(const char* ssid, const char* passwd){
 // ************************************************************************************
 //  
 bool Database::isConfigured() {
-  return false;
   this->read();
   char* guid = this->getRecord(GUID_INDEX);
-  return (strcmp(guid, SETUP_GUID) == 0);
+  if (guid != NULL){
+    return (strcmp(guid, SETUP_GUID) == 0);
+  }
+  
+  return false;
 }
 
 // ************************************************************************************
 //  
-void Database::open() {
+void Database::begin() {
   EEPROM.begin(EEPROM_SIZE);
 }
 
 // ************************************************************************************
 //  
-void Database::close() {
+void Database::end() {
   EEPROM.end();
 }
 
@@ -112,9 +117,17 @@ void Database::read(){
 // ************************************************************************************
 //  
 void Database::write(){
-  int len = strlen(this->_dataBuffer);
-  for(int n=0; n<len; n++){
+  int nullCount =0; 
+  for(int n=0; n<EEPROM_SIZE; n++){
+    EEPROM.write(n, this->_dataBuffer[n]); 
     
+    if (this->_dataBuffer[n] == 0)
+      nullCount++; 
+    else 
+      nullCount = 0; 
+
+    if (nullCount >= 3)
+      break;      
   }
 }
 
@@ -130,10 +143,7 @@ char* Database::getRecord(int index)
     //0 is the delimiter between records 
     if (this->_dataBuffer[n] == 0){
       curIndex++; 
-
-      //000 is the end-of-file 
-      if (this->_dataBuffer[n+1] == 0 && this->_dataBuffer[n+2] == 0)
-        return 0;
+      n++; 
     }
 
     //if we're at the index, return ptr
@@ -143,10 +153,10 @@ char* Database::getRecord(int index)
 
     //if past the index already, return null
     if (curIndex > index)
-      return 0;
+      return NULL;
   }
 
-  return false;
+  return NULL;
 }
 
 // ************************************************************************************
@@ -154,6 +164,10 @@ char* Database::getRecord(int index)
 void Database::setRecord(int index, const char* value, bool isLast)
 {
   char* recordPtr = this->getRecord(index); 
+  if (recordPtr == NULL){
+    recordPtr = this->_dataBuffer;
+  }
+    
   int len = strlen(value);
   strcpy(recordPtr, value);
   recordPtr[len] = 0; 
@@ -161,6 +175,25 @@ void Database::setRecord(int index, const char* value, bool isLast)
   if (isLast){
     recordPtr[len+1] = 0;
     recordPtr[len+2] = 0;
+  }
+}
+
+// ************************************************************************************
+//  
+void Database::printContents()
+{
+  for(int n=0; n<EEPROM_SIZE; n++)
+  {
+    char c = this->_dataBuffer[n];
+    if (c == 0)
+      DEBUG_PRINTLN(c); 
+    else {
+      DEBUG_PRINT(c); 
+      DEBUG_PRINT(","); 
+    }
+
+    if (c == 0 && this->_dataBuffer[n+1] == 0 && this->_dataBuffer[n+2] == 0)
+      break;
   }
 }
 
