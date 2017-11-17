@@ -17,7 +17,7 @@ WifiAP* ap;                     // wifi access point
 Database* database;             // EEPROM db
 WebServer* webServer;           // web server
 SetDataCallback* setCallback;   // callback when new data's been received from client 
-UdpServer* udp;               // UDP server listener (for probing requests) 
+UdpServer* udp;                 // UDP server listener (for probing requests) 
 
 bool dbConfigured = false; 
 byte progMode = MODE_NORMAL;
@@ -49,14 +49,16 @@ void setup() {
     enterSetupMode();
   }
   else {
-    webServer->start();
-    udp->begin(); 
+    enterNormalMode();
   }
 }
 
 void loop() {
   if (progMode == MODE_NORMAL){
     udp->listen();
+  } 
+  else {
+    ap->listen();
   }
     
   webServer->listen();
@@ -66,12 +68,14 @@ void enterSetupMode()
 {
   progMode = MODE_SETUP;
   ap->begin(); 
+  webServer->start();
 }
 
 void enterNormalMode()
 {
   progMode = MODE_NORMAL;
-  udp->begin(); 
+    webServer->start();
+    udp->begin(); 
 }
 
 bool SetDataCallback::dataSet(){

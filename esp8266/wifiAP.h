@@ -30,6 +30,7 @@ class WifiAP
     
     void begin(); 
     void end(); //TODO: implement
+    void listen();
 };
 /****************************************/
 
@@ -44,9 +45,10 @@ WifiAP::WifiAP()
 // ************************************************************************************
 //  
 void WifiAP::begin() {  
-  
+   
   static char ssid[12];
   sprintf(ssid, "IoThing %02d", ESP.getChipId() % 100);
+  DEBUG_PRINTLN("Starting AP"); 
   
   // Set WiFi to station mode and disconnect from an AP if it was previously connected
   WiFi.mode(WIFI_STA);
@@ -58,10 +60,15 @@ void WifiAP::begin() {
   WiFi.softAPConfig(ip, ip, netmask);
   WiFi.softAP(ssid);
   delay(100);
+  DEBUG_PRINTLN(ip.toString().c_str()); 
 
   //set all DNS to redirect to here
   _dns.setErrorReplyCode(DNSReplyCode::NoError);
   _dns.start(53, "*", ip);
+}
+
+void WifiAP::listen(){
+  this->_dns.processNextRequest();
 }
 
 #endif

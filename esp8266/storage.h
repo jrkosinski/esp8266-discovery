@@ -83,7 +83,7 @@ void Database::setWifiData(const char* ssid, const char* passwd){
 // ************************************************************************************
 //  
 bool Database::isConfigured() {
-  return true;
+  return false;
   this->read();
   char* guid = this->getRecord(GUID_INDEX);
   return (strcmp(guid, SETUP_GUID) == 0);
