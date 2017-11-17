@@ -28,7 +28,10 @@ var main = async(function() {
     if (!savedIp){
         logger.info('getting saved app data...');
         appData = await(storage.getAppData());
-        savedIp = appData.ip;
+        if (appData) {
+            logger.info('got saved data ' + JSON.stringify(appData));
+            savedIp = appData.ip;
+        }
     }
 
     //we have a saved IP
@@ -55,7 +58,9 @@ var main = async(function() {
         //found something? save the ip for next time 
         if (serverData && serverData.ip){
             serverFound = true;
-            appData.ip = serverData.ip;
+            if (!appData)
+                appData = {};
+            appData.ip = serverData.ip; 
             await(storage.saveAppData(appData));
             savedIp = appData.ip;
             logger.info('found server at ' + savedIp + ' by UDP');
