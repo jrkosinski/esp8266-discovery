@@ -4,10 +4,10 @@ var async = require('asyncawait/async');
 var await = require('asyncawait/await');
 var config = require('../config');
 
-var sendUdpBroadcast = async(function() {
-    return { ip: '192.168.1.1'}; 
+
+var scan = async(function(appData) {
 }); 
 
 module.exports = {
-    sendUdpBroadcast : sendUdpBroadcast
+    scan : scan
 };

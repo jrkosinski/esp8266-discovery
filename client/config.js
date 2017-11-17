@@ -2,6 +2,7 @@
 var profile = (process.env.PROFILE || ''); 
 
 module.exports = {  
+    loggingLevel : getLoggingLevel('LOGGING_LEVEL', 'ALL'), 
 };
 
 function getSetting(key, defaultValue){
