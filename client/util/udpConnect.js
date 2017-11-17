@@ -2,22 +2,21 @@
 
 var async = require('asyncawait/async');
 var await = require('asyncawait/await');
-var Netcat = require('node-netcat');
+var dgram = require('dgram'); 
 var config = require('../config');
 var logger = require('../util/logger')('UDP');
 
 var sendUdpBroadcast = async(function() {
     return new Promise((resolve, reject) => {
+        var client = dgram.createSocket("udp4");
+        await(client.bind(1212)); 
+        client.setBroadcast(true);
+        var message = "hello"; 
+        logger.info('sending...');
+        client.send(message, 0, message.length, 8021, "239.255.255.250");
 
-        var options = {
-            timeout: 3000,
-            // buffer, ascii, hex,utf8, base64
-            read_encoding: 'ascii'
-        }; 
-
-        var client = Netcat.udpClient(8021, '127.0.0.1', [options]);
-
-        client.on('message', (msg) => {
+        client.on('message', (data) => {
+            var msg = new Buffer(data).toString('ascii');
             resolve(JSON.parse(msg)); 
         });
 
@@ -25,16 +24,9 @@ var sendUdpBroadcast = async(function() {
             resolve(null); 
         });
 
-        client.once('open', () => {
-            logger.info('open');
-            client.send('hellos');
-        });
-
         client.once('error', (err) => {
             resolve(null); 
         });
-
-        client.send('hellos');
 
         setTimeout(() => {
             logger.info("timed out");
