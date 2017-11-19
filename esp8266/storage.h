@@ -16,7 +16,7 @@ const char* test_passwd = "HappyTime";
 /****************************************
  * Database
  * ---------
- *  
+ * EEPROM database interface. 
  */
 class Database 
 {
@@ -54,7 +54,10 @@ Database::~Database(){
 }
 
 // ************************************************************************************
+// gets the saved wifi SSID 
 // 
+// returns: point to the saved (string) value, or null if not found. 
+//  
 //TODO: this should be combined so we dont have to read twice in a row
 char* Database::getWifiSsid(){
   if (this->isConfigured())
@@ -64,6 +67,9 @@ char* Database::getWifiSsid(){
 }
 
 // ************************************************************************************
+// gets the saved wifi password 
+// 
+// returns: point to the saved (string) value, or null if not found. 
 //  
 char* Database::getWifiPasswd(){
   if (this->isConfigured())
@@ -73,7 +79,12 @@ char* Database::getWifiPasswd(){
 }
 
 // ************************************************************************************
-//  
+// sets wifi SSID and password and writes it to the database. 
+// 
+// args 
+//  ssid: the wifi SSID to save 
+//  passwd: the wifi passwd to save
+//
 void Database::setWifiData(const char* ssid, const char* passwd){
   this->read();
   this->setRecord(GUID_INDEX, SETUP_GUID, false); 
@@ -83,7 +94,8 @@ void Database::setWifiData(const char* ssid, const char* passwd){
 }
 
 // ************************************************************************************
-//  
+// returns true if the database has ever been written to; false otherwise. 
+// 
 bool Database::isConfigured() {
   this->read();
   char* guid = this->getRecord(GUID_INDEX);
@@ -95,19 +107,22 @@ bool Database::isConfigured() {
 }
 
 // ************************************************************************************
-//  
+// initializes this instance 
+// 
 void Database::begin() {
   EEPROM.begin(EEPROM_SIZE);
 }
 
 // ************************************************************************************
-//  
+// closes/deinitializes this instance 
+// 
 void Database::end() {
   EEPROM.end();
 }
 
 // ************************************************************************************
-//  
+// read entire contents of EEPROM into memory. 
+// 
 void Database::read(){
   for(int n=0; n<EEPROM_SIZE; n++) {
     this->_dataBuffer[n] = EEPROM.read(n); 
@@ -115,7 +130,8 @@ void Database::read(){
 }
 
 // ************************************************************************************
-//  
+// read entire contents of in-memory buffer into EEPROM. 
+// 
 void Database::write(){
   int nullCount =0; 
   for(int n=0; n<EEPROM_SIZE; n++){
@@ -132,6 +148,12 @@ void Database::write(){
 }
 
 // ************************************************************************************
+// gets a pointer to the value (char*) of the given record (specified by index)
+//
+// args
+//  index: index of record to retrieve.
+//
+// returns: pointer to the value of the record, or null if not found. 
 //  
 char* Database::getRecord(int index)
 {
@@ -160,18 +182,30 @@ char* Database::getRecord(int index)
 }
 
 // ************************************************************************************
+// overwrites the value of the specified record with the given value, but only in 
+// the in-memory buffer (doesn't automatically write it to the database as well) 
+//
+// args
+//  index: index of record to set.
+//  value: the string value to write. 
+//  isLast: true if the given record index is the last one in the database.
+//
+// returns: pointer to the value of the record, or null if not found. 
 //  
 void Database::setRecord(int index, const char* value, bool isLast)
 {
+  //get record 
   char* recordPtr = this->getRecord(index); 
   if (recordPtr == NULL){
     recordPtr = this->_dataBuffer;
   }
-    
+
+  //copy new data 
   int len = strlen(value);
   strcpy(recordPtr, value);
   recordPtr[len] = 0; 
 
+  //last record delimiter
   if (isLast){
     recordPtr[len+1] = 0;
     recordPtr[len+2] = 0;
@@ -179,7 +213,8 @@ void Database::setRecord(int index, const char* value, bool isLast)
 }
 
 // ************************************************************************************
-//  
+// for debugging; prints entire contents of database to serial. 
+// 
 void Database::printContents()
 {
   for(int n=0; n<EEPROM_SIZE; n++)

@@ -67,6 +67,8 @@ void WifiConnection::begin()
 // ************************************************************************************
 // attempts to connect to the wifi a predfined max number of times before 
 // returning failure
+//
+// returns: true if successful connection 
 // 
 bool WifiConnection::tryConnect()
 {

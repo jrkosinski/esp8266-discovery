@@ -7,7 +7,8 @@
 /****************************************
  * WifiDTO
  * --------
- *  
+ * Encapsulates wifi data (ssid and password), and sometimes local IP. 
+ * To be returned to client. 
  */
 class WifiDTO
 {
@@ -43,7 +44,13 @@ WifiDTO::WifiDTO(const char* ssid, const char* passwd, IPAddress localIP) : Wifi
 }
 
 // ************************************************************************************
-//  
+// converts current instance data to a JSON string 
+// 
+// args
+//  buffer: buffer to which to write JSON
+// 
+// returns: pointer to buffer containing JSON string
+// 
 char* WifiDTO::toJson(char* buffer) {  
   sprintf(buffer, "{ \"ssid\":\"%s\", \"password\":\"******\", \"ip\":\"%s\" }", 
     this->_ssid, 

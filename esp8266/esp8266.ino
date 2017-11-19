@@ -8,9 +8,14 @@
 #include "webserver.h"
 #include "udp.h"
 
+//normal mode and setup mode
 #define MODE_NORMAL       1
 #define MODE_SETUP        0
+
+//listen on UDP port for discovery requests
 #define UDP_PORT          8021
+
+//if set incorrectly, serial output will not be visible 
 #define SERIAL_BAUD_RATE  9600
 
 WifiConnection* wifi;           // wifi connection
@@ -24,28 +29,38 @@ bool dbConfigured = false;
 byte progMode = MODE_NORMAL;
 
 // ************************************************************************************
+// runs once, on power up of the chip. 
+// 
 void setup() {
   Serial.begin(SERIAL_BAUD_RATE); 
 
-  LED::begin();
-  LED::blink(3); 
-  
+  //initialize EEPROM database
   database = new Database(); 
   database->begin(); 
-  
+
+  //is DB set up (has data ever been written to it?) 
   dbConfigured = database->isConfigured();
 
+  //TODO: remove this 
   if (!dbConfigured){
     database->setWifiData("mina", "HappyTime");
     dbConfigured = database->isConfigured();
   }
 
-  DEBUG_PRINTLN("wifi data:");
-  DEBUG_PRINTLN(database->getWifiSsid());
-  DEBUG_PRINTLN(database->getWifiPasswd());
+  //what's in the database?
+  if (dbConfigured) {
+    DEBUG_PRINTLN("wifi data:");
+    DEBUG_PRINTLN(database->getWifiSsid());
+    DEBUG_PRINTLN(database->getWifiPasswd());
+  }
 
+  //instantiate web server
   webServer = new WebServer(database, setCallback);
+
+  //instantiate AP wifi
   ap = new WifiAP(); 
+
+  //instantiate UDP listener
   udp = new UdpServer(UDP_PORT);
   
   bool wifiConnected = false;
@@ -64,26 +79,34 @@ void setup() {
     enterSetupMode();
   }
   else {
+    //otherwise, enter normal mode 
     enterNormalMode();
   }
 }
 
 // ************************************************************************************
+// repeats continually.  
+// 
 void loop() {
+  //in normal mode, we need to handle UDP discovery requests
   if (progMode == MODE_NORMAL){
     if (udp)
       udp->listen();
   } 
+  //in setup mode, we need to listen on AP 
   else {
     if (ap)
       ap->listen();
   }
 
+  //in both modes, we need to listen on web server port
   if (webServer)
     webServer->listen();
 }
 
 // ************************************************************************************
+// initialize setup mode, in which requests can come in on the wifi AP. 
+// 
 void enterSetupMode()
 {
   DEBUG_PRINTLN("entering setup mode...");
@@ -93,6 +116,8 @@ void enterSetupMode()
 }
 
 // ************************************************************************************
+// initialize normal mode, in which requests can come in via web request or UDP. 
+// 
 void enterNormalMode()
 {
   DEBUG_PRINTLN("entering normal mode...");
@@ -102,6 +127,10 @@ void enterNormalMode()
 }
 
 // ************************************************************************************
+// callback called after new wifi data has been written to the database. 
+// 
+// returns: true on successful connection 
+// 
 bool SetDataCallback::dataSet(){
   if (wifi->tryConnect()){
     enterNormalMode(); 

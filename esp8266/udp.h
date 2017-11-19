@@ -17,7 +17,7 @@
 /****************************************
  * UdpServer
  * ----------
- *  
+ * Listens on a given port for UDP discovery requests. 
  */
 class UdpServer 
 {
@@ -38,26 +38,33 @@ class UdpServer
 
 
 // ************************************************************************************
-//  
+// constructor 
+// 
+// args 
+//  port: the port on which to listen 
+// 
 UdpServer::UdpServer(uint32_t port){
   this->_port = port;
 }
 
 // ************************************************************************************
-//  
+// initializes this instance; prepares it for use 
+// 
 void UdpServer::begin(){
   this->_udp.beginMulticast(WiFi.localIP(), UDP_MULTICAST_IP, this->_port); 
   DEBUG_PRINTLN("UDP server listening...");
 }
 
 // ************************************************************************************
-//  
+// deinitializes this instance 
+//
 void UdpServer::end(){
   //TODO: implement
 }
 
 // ************************************************************************************
-//  
+// to be called from loop() to handle incoming requests (if any) 
+// 
 void UdpServer::listen(){
   int cb = this->_udp.parsePacket();
   if (cb) {
@@ -73,7 +80,14 @@ void UdpServer::listen(){
 }
 
 // ************************************************************************************
-//  
+// handles an incoming discovery request 
+// 
+// args
+//  remoteIP: IP from which request was received
+//  remotePort: port from which request was received
+//  data: request data 
+//  len: length of request data 
+//
 void UdpServer::handleProbe(IPAddress remoteIP, unsigned int remotePort, uint8_t *data, size_t len) 
 {
   data[len] = 0;

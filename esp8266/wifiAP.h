@@ -18,7 +18,7 @@ const IPAddress netmask(255, 255, 255, 0);
 /****************************************
  * WifiAP
  * ------
- *  
+ * opens up a wifi access point, and listens on it for requests. 
  */
 class WifiAP
 {
@@ -37,13 +37,14 @@ class WifiAP
 
 // ************************************************************************************
 // constructor 
-//  
+// 
 WifiAP::WifiAP()
 {
 }
 
 // ************************************************************************************
-//  
+// initializes this instance; prepares it for use 
+// 
 void WifiAP::begin() {  
    
   static char ssid[12];
@@ -67,6 +68,9 @@ void WifiAP::begin() {
   _dns.start(53, "*", ip);
 }
 
+// ************************************************************************************
+// to be called from loop() to handle incoming requests (if any) 
+// 
 void WifiAP::listen(){
   this->_dns.processNextRequest();
 }

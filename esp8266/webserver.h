@@ -16,6 +16,11 @@
 #include "storage.h" 
 
 
+/****************************************
+ * SetDataCallback
+ * ----------------
+ * Callback to be called when new data has been written.
+ */
 class SetDataCallback
 { 
   public:
@@ -30,7 +35,7 @@ bool pingReceived = false;
 /****************************************
  * WebServer
  * ----------
- *  
+ * Listens on port 80 for HTTP requests. 
  */
 class WebServer
 {
@@ -56,6 +61,10 @@ class WebServer
 // ************************************************************************************
 // constructor 
 //  
+// args
+//  database: pointer to database instance 
+//  setCallback: callback to be called after new data written 
+// 
 WebServer::WebServer(Database* database, SetDataCallback* setCallback)
 {
   this->_server = new ESP8266WebServer(80); 
@@ -64,7 +73,8 @@ WebServer::WebServer(Database* database, SetDataCallback* setCallback)
 }
 
 // ************************************************************************************
-//  
+// starts listening for requests 
+// 
 void WebServer::start() {  
   DEBUG_PRINTLN("starting web server"); 
   
@@ -84,7 +94,8 @@ void WebServer::start() {
 }
 
 // ************************************************************************************
-//  
+// to be called from loop() to handle incoming requests (if any) 
+// 
 void WebServer::listen() {  
   this->_server->handleClient();
 
@@ -104,7 +115,8 @@ void WebServer::listen() {
 
 //TODO: handle these callbacks better 
 // ************************************************************************************
-//  
+// handles the /get request 
+// 
 void WebServer::handleGet() {
   char buffer[512]; 
   WifiDTO dto(this->_database->getWifiSsid(), this->_database->getWifiPasswd(), WiFi.localIP());
@@ -112,6 +124,7 @@ void WebServer::handleGet() {
 }
 
 // ************************************************************************************
+// handles the /ping request 
 //  
 void WebServer::handlePing() {
   DEBUG_PRINTLN("handling ping");
@@ -119,7 +132,8 @@ void WebServer::handlePing() {
 }
 
 // ************************************************************************************
-//  
+// handles the /set request 
+//
 void WebServer::handleSet() {
   String ssid = this->_server->arg("ssid");
   String passwd = this->_server->arg("password");
