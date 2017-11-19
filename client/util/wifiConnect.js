@@ -41,17 +41,19 @@ var scan = async(function() {
             
             //connect to network 
             if (ssid) {
-                wifi.connect({ ssid : ssid, password : "password"}, function(err) {
-                    if (err) {
-                        logger.error(err);
-                        resolve(false);
-                    }
-                    else {
-                        logger.info('connected to ' + ssid);
-                        success = true;
-                        resolve(true);
-                    }
-                });
+                //wifi.disconnect(() => {
+                    wifi.connect({ ssid : ssid, password : ""}, (err) => {
+                        if (err) {
+                            logger.error(err);
+                            resolve(false);
+                        }
+                        else {
+                            logger.info('connected to ' + ssid);
+                            success = true;
+                            resolve(true);
+                        }
+                    });
+                //}); 
             }
             else
                 resolve(false);
