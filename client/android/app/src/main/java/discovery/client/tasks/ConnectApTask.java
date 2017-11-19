@@ -10,12 +10,12 @@ import discovery.client.api.UdpBroadcast;
 /**
  * Created by Home on 25/4/2560.
  */
-public class UdpBroadcastTask extends AsyncTask<Context, Object, ApiStatus>
+public class ConnectApTask extends AsyncTask<Context, Object, ApiStatus>
 {
     protected ApiStatus doInBackground(Context... args)
     {
         UdpBroadcast udp = new UdpBroadcast(args[0]);
-        udp.sendBroadcast("hello" );
+        udp.sendBroadcast("discovery:012345678998765432102017:discovery" );
 
         return Global.device.status;
     }

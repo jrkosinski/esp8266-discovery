@@ -20,8 +20,7 @@ public class LocalStorage
     private static SharedPreferences sharedPreferences;
     private static SharedPreferences.Editor editor;
 
-    private static final String IpAddressKey = "username";
-    private static final String PortNumberKey = "Password";
+    private static final String IpAddressKey = "ipAAddress";
 
     private static String ipAddress;
     private static int portNumber;
@@ -53,38 +52,12 @@ public class LocalStorage
             setIpAddress("");
     }
 
-    public static int getPortNumber()
-    {
-        if (sharedPreferences != null)
-        {
-            if (portNumber == 0)
-            {
-                String value = sharedPreferences.getString(PortNumberKey, "");
-                if (value != null && value.length() > 0)
-                    portNumber = Integer.parseInt(value);
-            }
-        }
-
-        return portNumber;
-    }
-
-    public static void setPortNumber(int value)
-    {
-        portNumber = value;
-        if (editor != null)
-        {
-            editor.putString(PortNumberKey, Integer.toString(value));
-            editor.commit();
-        }
-    }
-
     /*
     Clears the database.
      */
     public static void clear()
     {
         setIpAddress("");
-        setPortNumber(0);
     }
 
     public static void restoreDevice(Device device)
@@ -97,14 +70,12 @@ public class LocalStorage
             catch (UnknownHostException e){}
         }
 
-        device.tcpPort = getPortNumber();
         Log.d("Restoring device", Global.device.toString());
     }
 
     public static void saveDevice(Device device)
     {
         setIpAddress(device.ipAddress);
-        setPortNumber(device.tcpPort);
         Log.d("Saving device", Global.device.toString());
     }
 

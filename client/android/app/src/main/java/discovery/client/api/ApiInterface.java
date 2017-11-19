@@ -21,6 +21,7 @@ import okhttp3.Response;
 */
 public class ApiInterface implements  IApiInterface
 {
+    //direct web call to chip (http get)
     public ApiStatus getStatus()
     {
         /*
@@ -29,7 +30,7 @@ public class ApiInterface implements  IApiInterface
             OkHttpClient client = new OkHttpClient();
 
             Request request = new Request.Builder()
-                    .url(this.buildUrl("status"))
+                    .url(this.buildUrl("get"))
                     .build();
 
             Response response = client.newCall(request).execute();

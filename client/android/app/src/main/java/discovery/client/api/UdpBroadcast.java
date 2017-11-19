@@ -65,7 +65,7 @@ public class UdpBroadcast
 
                 //TODO: make the port number a setting
                 //broadcast packet to find device
-                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, getBroadcastAddress(), 2001);
+                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, getBroadcastAddress(), 8021);
                 this.socket.send(sendPacket);
                 Log.i(getClass().getName(), "Broadcast packet sent to: " + getBroadcastAddress().getHostAddress());
 

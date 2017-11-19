@@ -6,16 +6,17 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:name="discovery.discovery.client.TheApp"
+        android:name="discovery.client.TheApp"
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="discovery.discovery.client.activities.MainActivity"
+            android:name="discovery.client.activities.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" >
             <intent-filter>
@@ -25,14 +26,14 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="discovery.discovery.client.activities.SetupActivity"
+            android:name="discovery.client.activities.SetupActivity"
             android:label="@string/title_activity_setup" />
         <activity
-            android:name="discovery.discovery.client.activities.ScenesActivity"
+            android:name="discovery.client.activities.ScenesActivity"
             android:label="@string/title_activity_scenes" >
         </activity>
         <activity
-            android:name="discovery.discovery.client.activities.FindDevicesActivity"
+            android:name="discovery.client.activities.FindDevicesActivity"
             android:label="@string/title_activity_find_devices" >
         </activity>
     </application>
