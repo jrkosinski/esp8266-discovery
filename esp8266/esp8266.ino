@@ -28,7 +28,7 @@ void setup() {
   Serial.begin(SERIAL_BAUD_RATE); 
 
   LED::begin();
-  LED::blink(3); 
+  LED::blink(10); 
   
   database = new Database(); 
   database->begin(); 
