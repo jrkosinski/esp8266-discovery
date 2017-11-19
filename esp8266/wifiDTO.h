@@ -59,6 +59,6 @@ char* WifiDTO::toJson(char* buffer) {
   ); 
 
   return buffer;
-}
+} 
 
 #endif
